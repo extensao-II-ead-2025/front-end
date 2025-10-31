@@ -1,13 +1,13 @@
 :root {
-    --purple: #6c3aff;
-    --purple-hover: #5a30d6;
-    --text: #1e1e1e;
+    --purple: #5C3FD6;
+    --purple-hover: #7B61FF;
+    --text: #1A1A1A;
     --gray: #666;
     --bg: #ffffff;
-    --border: #dcdcdc;
+    --border: #9CA3AF;
     --radius: 10px;
     --font: 'Inter', sans-serif;
-    --disabled: #9CA3AF;
+    --disabled: #9CA3AF
 }
 
 * {
@@ -145,7 +145,6 @@ h2 {
     vertical-align: middle;
 }
 
-
 .password-wrapper button:hover {
     color: var(--purple);
 }
@@ -185,7 +184,7 @@ h2 {
     }
 
     .image-side {
-        display: none;
+        height: 45vh;
     }
 
     .form-side {
