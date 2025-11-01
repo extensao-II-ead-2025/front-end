@@ -40,14 +40,23 @@
         <main class="main-content">
 
             <header class="topbar">
+                <div class="mobile-logo">logo</div>
                 <div class="search-box">
                     <input type="text" placeholder="Pesquisar..." />
                     <span class="material-icons-outlined">search</span>
                 </div>
 
                 <div class="user-info">
-                    <span class="material-icons-outlined">notifications</span>
+
+                    <div class="notification-wrapper">
+                        <span id="notificationIcon" class="material-icons-outlined">notifications</span>
+                        <div id="notificationDropdown" class="notification-dropdown">
+                            <p>Sem notificações no momento</p>
+                        </div>
+                    </div>
+
                     <span class="material-icons-outlined">settings</span>
+
                     <div class="user-avatar">
                         <div class="avatar-icon">
                             <span class="material-icons-outlined">person</span>
@@ -57,7 +66,6 @@
                             <p class="role">Admin</p>
                         </div>
                     </div>
-                </div>
             </header>
 
             <section class="overview">
@@ -181,7 +189,6 @@
             </section>
         </main>
     </div>
-
     <!-- Scripts -->
     <script src="../../js/config/supabase-config.js"></script>
     <script src="../../js/services/auth.service.js"></script>
@@ -190,6 +197,7 @@
     <script src="../../js/components/toast.js"></script>
     <script src="../../js/components/modal.js"></script>
     <script src="../../js/dashboard.js"></script>
+
 </body>
 
 </html>
