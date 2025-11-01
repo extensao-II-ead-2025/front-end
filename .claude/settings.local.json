@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git checkout:*)",
+      "Bash(git pull:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(open:*)",
+      "Read(//var/folders/95/tx79hl3x52949tv951t8yr0h0000gp/T/TemporaryItems/NSIRD_screencaptureui_tkEl8v/**)",
+      "WebFetch(domain:fonts.google.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
