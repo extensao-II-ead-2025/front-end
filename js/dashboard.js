@@ -5,32 +5,75 @@
  */
 
 // ============================================
-// PROTEÇÃO DE ROTA
+// VARIÁVEIS GLOBAIS
+// ============================================
+
+let userName, userNameHeader, balanceEl, expenseEl, goalEl, transactionsList, addTransactionBtn, logoutBtn
+
+// ============================================
+// INICIALIZAÇÃO
 // ============================================
 
 ;(async () => {
   const authenticated = await isAuthenticated()
   if (!authenticated) {
-    window.location.href = '/src/pages/login.html'
+    window.location.href = './login.html'
     return
   }
+
+  // Inicializar elementos do DOM
+  initializeElements()
+
+  // Inicializar event listeners
+  initializeEventListeners()
 
   // Carregar dados do dashboard
   await loadDashboard()
 })()
 
 // ============================================
-// ELEMENTOS DO DOM
+// INICIALIZAR ELEMENTOS DO DOM
 // ============================================
 
-const userName = document.querySelector('.overview-header h2')
-const userNameHeader = document.querySelector('.avatar-text .name')
-const balanceEl = document.querySelector('.cards .card:nth-child(1) .value')
-const expenseEl = document.querySelector('.cards .card:nth-child(2) .value')
-const goalEl = document.querySelector('.cards .card:nth-child(3) .value')
-const transactionsList = document.querySelector('.transactions-list')
-const addTransactionBtn = document.querySelector('.add-transaction')
-const logoutBtn = document.querySelector('.logout')
+function initializeElements() {
+  userName = document.querySelector('.overview-header h2')
+  userNameHeader = document.querySelector('.avatar-text .name')
+  balanceEl = document.querySelector('.cards .card:nth-child(1) .value')
+  expenseEl = document.querySelector('.cards .card:nth-child(2) .value')
+  goalEl = document.querySelector('.cards .card:nth-child(3) .value')
+  transactionsList = document.querySelector('.transactions-list')
+  addTransactionBtn = document.querySelector('.add-transaction')
+  logoutBtn = document.querySelector('.logout')
+
+  console.log('Elementos inicializados:')
+  console.log('addTransactionBtn:', addTransactionBtn)
+  console.log('logoutBtn:', logoutBtn)
+}
+
+// ============================================
+// INICIALIZAR EVENT LISTENERS
+// ============================================
+
+function initializeEventListeners() {
+  // Botão de adicionar transação
+  if (addTransactionBtn) {
+    console.log('Adicionando event listener ao botão de adicionar transação')
+    addTransactionBtn.addEventListener('click', (e) => {
+      e.preventDefault()
+      openAddTransactionModal()
+    })
+  } else {
+    console.error('Botão de adicionar transação não encontrado!')
+  }
+
+  // Botão de logout
+  if (logoutBtn) {
+    console.log('Adicionando event listener ao botão de logout')
+    logoutBtn.addEventListener('click', handleLogout)
+  } else {
+    console.error('Botão de logout não encontrado!')
+  }
+}
 
 // ============================================
 // CARREGAR DADOS DO DASHBOARD
@@ -54,6 +97,9 @@ async function loadDashboard() {
 
     // Carregar últimas transações
     await loadRecentTransactions()
+
+    // Carregar gráfico de gastos dos últimos 7 dias
+    await loadExpensesChart()
 
     // Esconder loading
     hideLoading()
@@ -113,6 +159,101 @@ async function loadRecentTransactions() {
 }
 
 // ============================================
+// CARREGAR GRÁFICO DE GASTOS DOS ÚLTIMOS 7 DIAS
+// ============================================
+
+async function loadExpensesChart() {
+  try {
+    // Calcular data de 7 dias atrás
+    const today = new Date()
+    const sevenDaysAgo = new Date(today)
+    sevenDaysAgo.setDate(today.getDate() - 6) // Últimos 7 dias incluindo hoje
+
+    // Buscar transações dos últimos 7 dias
+    const result = await getTransactions({
+      startDate: sevenDaysAgo.toISOString().split('T')[0],
+      endDate: today.toISOString().split('T')[0]
+    })
+
+    if (!result.success) {
+      console.error('Erro ao carregar dados do gráfico')
+      return
+    }
+
+    // Criar array com os últimos 7 dias
+    const days = []
+    const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb']
+
+    for (let i = 6; i >= 0; i--) {
+      const date = new Date(today)
+      date.setDate(today.getDate() - i)
+      days.push({
+        date: date.toISOString().split('T')[0],
+        label: dayLabels[date.getDay()],
+        income: 0,
+        expense: 0
+      })
+    }
+
+    // Agrupar transações por dia
+    result.data.forEach(transaction => {
+      const transactionDate = transaction.date
+      const day = days.find(d => d.date === transactionDate)
+
+      if (day) {
+        if (transaction.type === 'income') {
+          day.income += parseFloat(transaction.amount)
+        } else {
+          day.expense += parseFloat(transaction.amount)
+        }
+      }
+    })
+
+    // Calcular valor máximo para escala
+    const maxValue = Math.max(...days.map(d => Math.max(d.income, d.expense)), 1)
+
+    // Renderizar gráfico
+    const chartContainer = document.querySelector('.expenses-chart')
+    if (!chartContainer) return
+
+    chartContainer.innerHTML = ''
+
+    days.forEach((day) => {
+      const barGroup = document.createElement('div')
+      barGroup.className = 'bar-group'
+
+      // Calcular altura das barras (porcentagem do máximo)
+      const expenseHeight = maxValue > 0 ? (day.expense / maxValue) * 100 : 0
+      const incomeHeight = maxValue > 0 ? (day.income / maxValue) * 100 : 0
+
+      // Alternar cores
+      const expenseColor = '#9C82FF'
+      const incomeColor = '#67E5D2'
+
+      // Se houver ambos, mostrar apenas o maior (ou poderia empilhar)
+      const hasTransactions = day.expense > 0 || day.income > 0
+      const height = Math.max(expenseHeight, incomeHeight)
+      const color = day.expense >= day.income ? expenseColor : incomeColor
+
+      barGroup.innerHTML = `
+        <div class="bar" style="height: ${hasTransactions ? height : 5}%; background-color: ${hasTransactions ? color : '#E5E7EB'};"></div>
+        <span class="day-label">${day.label}</span>
+      `
+
+      // Adicionar tooltip com valores
+      if (hasTransactions) {
+        barGroup.title = `${day.label}\nReceitas: ${formatCurrency(day.income)}\nDespesas: ${formatCurrency(day.expense)}`
+      }
+
+      chartContainer.appendChild(barGroup)
+    })
+
+  } catch (error) {
+    console.error('Erro ao carregar gráfico de gastos:', error)
+  }
+}
+
+// ============================================
 // CRIAR ITEM DE TRANSAÇÃO
 // ============================================
 
@@ -155,90 +296,100 @@ function createTransactionItem(transaction) {
 // MODAL DE ADICIONAR TRANSAÇÃO
 // ============================================
 
-addTransactionBtn.addEventListener('click', async () => {
-  // Carregar categorias
-  const categoriesIncome = await getCategories('income')
-  const categoriesExpense = await getCategories('expense')
+async function openAddTransactionModal() {
+  try {
+    // Carregar categorias
+    const categoriesIncome = await getCategories('income')
+    const categoriesExpense = await getCategories('expense')
 
-  const incomeOptions = categoriesIncome.data.map(cat =>
-    `<option value="${cat.id}">${cat.name}</option>`
-  ).join('')
+    if (!categoriesIncome.success || !categoriesExpense.success) {
+      showError('Erro ao carregar categorias')
+      return
+    }
 
-  const expenseOptions = categoriesExpense.data.map(cat =>
-    `<option value="${cat.id}">${cat.name}</option>`
-  ).join('')
+    const incomeOptions = categoriesIncome.data.map(cat =>
+      `<option value="${cat.id}">${cat.name}</option>`
+    ).join('')
 
-  const today = new Date().toISOString().split('T')[0]
+    const expenseOptions = categoriesExpense.data.map(cat =>
+      `<option value="${cat.id}">${cat.name}</option>`
+    ).join('')
 
-  const modalContent = `
-    <form id="transactionForm" class="transaction-form">
-      <div class="form-group">
-        <label>Tipo de transação</label>
-        <div class="radio-group">
-          <label class="radio-option">
-            <input type="radio" name="type" value="expense" checked />
-            <span>Despesa</span>
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="type" value="income" />
-            <span>Receita</span>
-          </label>
-        </div>
-      </div>
+    const today = new Date().toISOString().split('T')[0]
 
-      <div class="form-group">
-        <label for="description">Descrição *</label>
-        <input type="text" id="description" name="description" placeholder="Ex: Compras no supermercado" required />
-      </div>
-
-      <div class="form-row">
+    const modalContent = `
+      <form id="transactionForm" class="transaction-form">
         <div class="form-group">
-          <label for="amount">Valor *</label>
-          <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="0,00" required />
+          <label>Tipo de transação</label>
+          <div class="radio-group">
+            <label class="radio-option">
+              <input type="radio" name="type" value="expense" checked />
+              <span>Despesa</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="type" value="income" />
+              <span>Receita</span>
+            </label>
+          </div>
         </div>
 
         <div class="form-group">
-          <label for="date">Data *</label>
-          <input type="date" id="date" name="date" value="${today}" required />
+          <label for="description">Descrição *</label>
+          <input type="text" id="description" name="description" placeholder="Ex: Compras no supermercado" required />
         </div>
-      </div>
 
-      <div class="form-group">
-        <label for="category">Categoria *</label>
-        <select id="category" name="category" required>
-          <optgroup label="Despesas" id="expense-categories">
-            ${expenseOptions}
-          </optgroup>
-          <optgroup label="Receitas" id="income-categories" style="display:none;">
-            ${incomeOptions}
-          </optgroup>
-        </select>
-      </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="amount">Valor *</label>
+            <input type="number" id="amount" name="amount" step="0.01" min="0.01" placeholder="0,00" required />
+          </div>
 
-      <div class="form-group">
-        <label for="notes">Observações (opcional)</label>
-        <textarea id="notes" name="notes" rows="3" placeholder="Adicione detalhes..."></textarea>
-      </div>
+          <div class="form-group">
+            <label for="date">Data *</label>
+            <input type="date" id="date" name="date" value="${today}" required />
+          </div>
+        </div>
 
-      <div class="form-actions">
-        <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
-        <button type="submit" class="btn btn-primary">Adicionar transação</button>
-      </div>
-    </form>
-  `
+        <div class="form-group">
+          <label for="category">Categoria *</label>
+          <select id="category" name="category" required>
+            <optgroup label="Despesas" id="expense-categories">
+              ${expenseOptions}
+            </optgroup>
+            <optgroup label="Receitas" id="income-categories" style="display:none;">
+              ${incomeOptions}
+            </optgroup>
+          </select>
+        </div>
 
-  showModal({
-    title: '+ Adicionar transação',
-    content: modalContent,
-    size: 'medium'
-  })
+        <div class="form-group">
+          <label for="notes">Observações (opcional)</label>
+          <textarea id="notes" name="notes" rows="3" placeholder="Adicione detalhes..."></textarea>
+        </div>
 
-  // Adicionar estilos do formulário
-  addFormStyles()
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+          <button type="submit" class="btn btn-primary">Adicionar transação</button>
+        </div>
+      </form>
+    `
 
-  // Event listeners do formulário
-  setupTransactionForm()
-})
+    showModal({
+      title: '+ Adicionar transação',
+      content: modalContent,
+      size: 'medium'
+    })
+
+    // Adicionar estilos do formulário
+    addFormStyles()
+
+    // Event listeners do formulário
+    setupTransactionForm()
+  } catch (error) {
+    console.error('Erro ao abrir modal:', error)
+    showError('Erro ao abrir formulário')
+  }
+}
 
 // ============================================
 // CONFIGURAR FORMULÁRIO DE TRANSAÇÃO
@@ -484,7 +635,7 @@ async function deleteTransactionConfirm(transactionId) {
 // LOGOUT
 // ============================================
 
-logoutBtn.addEventListener('click', async (e) => {
+async function handleLogout(e) {
   e.preventDefault()
 
   if (!confirm('Deseja sair da sua conta?')) {
@@ -496,12 +647,12 @@ logoutBtn.addEventListener('click', async (e) => {
   if (result.success) {
     showSuccess('Logout realizado com sucesso!')
     setTimeout(() => {
-      window.location.href = '/src/pages/login.html'
+      window.location.href = './login.html'
     }, 1000)
   } else {
     showError('Erro ao fazer logout')
   }
-})
+}
 
 // ============================================
 // UTILITÁRIOS

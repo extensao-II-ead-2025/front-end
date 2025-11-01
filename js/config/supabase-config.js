@@ -47,34 +47,15 @@ if (SUPABASE_URL === 'https://seu-projeto.supabase.co' ||
 // Certifique-se de que o script está carregado no HTML:
 // <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-let supabase = null
-
-// Função para inicializar o Supabase
-function initSupabase() {
-  if (typeof window.supabase === 'undefined') {
-    console.error('❌ Supabase JS não foi carregado! Adicione o script CDN no HTML.')
-    return null
-  }
-
-  try {
-    supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
-    console.log('✅ Supabase inicializado com sucesso!')
-    return supabase
-  } catch (error) {
-    console.error('❌ Erro ao inicializar Supabase:', error)
-    return null
-  }
+// Verificar se o Supabase CDN foi carregado
+if (typeof window.supabase === 'undefined') {
+  console.error('❌ Supabase JS não foi carregado! Adicione o script CDN no HTML.')
+  throw new Error('Supabase CDN não carregado')
 }
 
-// Inicializar automaticamente quando o script é carregado
-if (typeof window !== 'undefined') {
-  // Se estamos no navegador, esperar o DOM carregar
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initSupabase)
-  } else {
-    initSupabase()
-  }
-}
+// Inicializar cliente Supabase imediatamente
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+console.log('✅ Supabase inicializado com sucesso!')
 
 // ============================================
 // EXPORTAR CONFIGURAÇÕES

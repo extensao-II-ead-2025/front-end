@@ -33,7 +33,7 @@ togglePassword.addEventListener('click', () => {
 ;(async () => {
   const authenticated = await isAuthenticated()
   if (authenticated) {
-    window.location.href = '/src/pages/dashboard.html'
+    window.location.href = './dashboard.html'
   }
 })()
 
@@ -82,6 +82,7 @@ loginForm.addEventListener('submit', async (e) => {
   try {
     // Fazer login via Supabase
     const result = await signIn(email, password)
+    console.log('Resultado do login:', result)
 
     if (result.success) {
       // Sucesso!
@@ -91,12 +92,17 @@ loginForm.addEventListener('submit', async (e) => {
       const redirectUrl = sessionStorage.getItem('redirectAfterLogin')
       sessionStorage.removeItem('redirectAfterLogin')
 
+      console.log('Redirecionando para:', redirectUrl || './dashboard.html')
+
       // Aguardar 1 segundo e redirecionar
       setTimeout(() => {
-        window.location.href = redirectUrl || '/src/pages/dashboard.html'
+        // Usar caminho relativo - estamos em /src/pages/login.html
+        console.log('Executando redirecionamento...')
+        window.location.href = redirectUrl || './dashboard.html'
       }, 1000)
     } else {
       // Erro no login
+      console.error('Erro no login:', result.message)
       showError(result.message)
 
       // Reabilitar botão

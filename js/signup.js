@@ -39,7 +39,7 @@ togglePasswordButtons.forEach((button) => {
 ;(async () => {
   const authenticated = await isAuthenticated()
   if (authenticated) {
-    window.location.href = '/src/pages/dashboard.html'
+    window.location.href = './dashboard.html'
   }
 })()
 
