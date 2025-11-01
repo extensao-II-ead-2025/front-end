@@ -318,12 +318,51 @@
     justify-content: flex-end;
     flex: 1;
     height: 100%;
+    position: relative;
+    cursor: pointer;
 }
 
 .bar {
     width: 50%;
     border-radius: 8px 8px 0 0;
-    transition: height 0.3s ease;
+    transition: height 0.3s ease, opacity 0.2s;
+}
+
+.bar-group:hover .bar {
+    opacity: 0.8;
+}
+
+/* Custom tooltip */
+.chart-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.9);
+    color: white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    z-index: 10;
+    margin-bottom: 8px;
+}
+
+.chart-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 5px solid transparent;
+    border-top-color: rgba(0, 0, 0, 0.9);
+}
+
+.bar-group:hover .chart-tooltip {
+    opacity: 1;
 }
 
 .day-label {
@@ -380,6 +419,14 @@
 .transactions-list li > div:first-of-type {
     flex: 1;
     min-width: 0;
+}
+
+/* Wrapper for value and actions */
+.transactions-list li > div:last-of-type {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
 }
 
 .transaction-title {

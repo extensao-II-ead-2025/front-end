@@ -235,15 +235,20 @@ async function loadExpensesChart() {
       const height = Math.max(expenseHeight, incomeHeight)
       const color = day.expense >= day.income ? expenseColor : incomeColor
 
+      // Criar tooltip customizado
+      const tooltipContent = hasTransactions
+        ? `<div class="chart-tooltip">
+             <div><strong>${day.label}</strong></div>
+             <div>Receitas: ${formatCurrency(day.income)}</div>
+             <div>Despesas: ${formatCurrency(day.expense)}</div>
+           </div>`
+        : ''
+
       barGroup.innerHTML = `
+        ${tooltipContent}
         <div class="bar" style="height: ${hasTransactions ? height : 5}%; background-color: ${hasTransactions ? color : '#E5E7EB'};"></div>
         <span class="day-label">${day.label}</span>
       `
-
-      // Adicionar tooltip com valores
-      if (hasTransactions) {
-        barGroup.title = `${day.label}\nReceitas: ${formatCurrency(day.income)}\nDespesas: ${formatCurrency(day.expense)}`
-      }
 
       chartContainer.appendChild(barGroup)
     })

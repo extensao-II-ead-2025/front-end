@@ -109,9 +109,12 @@ CREATE TRIGGER update_goals_updated_at
 -- ============================================
 -- 5. VIEW: dashboard_summary
 -- Visão consolidada para o dashboard
+-- IMPORTANTE: Usa SECURITY INVOKER para respeitar RLS
 -- ============================================
 
-CREATE OR REPLACE VIEW public.dashboard_summary AS
+CREATE OR REPLACE VIEW public.dashboard_summary
+WITH (security_invoker = true)  -- CRÍTICO: Respeita RLS do usuário, não usa SECURITY DEFINER
+AS
 SELECT
   user_id,
   -- Saldo total (receitas - despesas)
@@ -173,7 +176,7 @@ COMMENT ON TABLE public.profiles IS 'Perfis estendidos dos usuários';
 COMMENT ON TABLE public.categories IS 'Categorias personalizadas de receitas e despesas';
 COMMENT ON TABLE public.transactions IS 'Lançamentos financeiros (receitas e despesas)';
 COMMENT ON TABLE public.goals IS 'Objetivos e metas financeiras dos usuários';
-COMMENT ON VIEW public.dashboard_summary IS 'Resumo consolidado para o dashboard';
+COMMENT ON VIEW public.dashboard_summary IS 'Resumo consolidado para o dashboard - SECURITY INVOKER para respeitar RLS';
 
 -- ============================================
 -- FIM DO SCHEMA
