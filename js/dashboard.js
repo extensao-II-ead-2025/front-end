@@ -76,6 +76,22 @@ function initializeEventListeners() {
 }
 
 // ============================================
+// OBTER SAUDAÇÃO BASEADA NO HORÁRIO
+// ============================================
+
+function getGreeting() {
+  const hour = new Date().getHours()
+
+  if (hour >= 5 && hour < 12) {
+    return 'Bom dia'
+  } else if (hour >= 12 && hour < 18) {
+    return 'Boa tarde'
+  } else {
+    return 'Boa noite'
+  }
+}
+
+// ============================================
 // CARREGAR DADOS DO DASHBOARD
 // ============================================
 
@@ -88,7 +104,8 @@ async function loadDashboard() {
     const user = await getCurrentUser()
     if (user) {
       const firstName = user.user_metadata?.full_name?.split(' ')[0] || 'Usuário'
-      userName.textContent = `Bom dia, ${firstName}!`
+      const greeting = getGreeting()
+      userName.textContent = `${greeting}, ${firstName}!`
       userNameHeader.textContent = user.user_metadata?.full_name || 'Usuário'
     }
 
