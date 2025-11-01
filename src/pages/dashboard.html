@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard Financeiro</title>
+
+    <!-- Fonte e ícones -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
+
+    <link rel="stylesheet" href="../styles/dashboard.css" />
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">logo</div>
+            <nav>
+                <a class="active" href="#">
+                    <span class="material-icons-outlined">dashboard</span>
+                    Panorama
+                </a>
+                <a href="#"><span class="material-icons-outlined">sync_alt</span>Lançamentos</a>
+                <a href="#"><span class="material-icons-outlined">flag</span>Objetivos</a>
+                <a href="#"><span class="material-icons-outlined">person</span>Perfil</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#"><span class="material-icons-outlined">settings</span>Configurações</a>
+                <a href="#" class="logout"><span class="material-icons-outlined">logout</span>Sair</a>
+            </div>
+        </aside>
+
+        <!-- Conteúdo principal -->
+        <main class="main-content">
+
+            <header class="topbar">
+                <div class="search-box">
+                    <input type="text" placeholder="Pesquisar..." />
+                    <span class="material-icons-outlined">search</span>
+                </div>
+
+                <div class="user-info">
+                    <span class="material-icons-outlined">notifications</span>
+                    <span class="material-icons-outlined">settings</span>
+                    <div class="user-avatar">
+                        <div class="avatar-icon">
+                            <span class="material-icons-outlined">person</span>
+                        </div>
+                        <div class="avatar-text">
+                            <p class="name">Sara Cavalcante</p>
+                            <p class="role">Admin</p>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="overview">
+                <div class="overview-header">
+                    <h2>Bom dia, Sara!</h2>
+                    <a href="#" class="add-transaction">+ Adicionar transação</a>
+                </div>
+
+                <div class="cards">
+                    <div class="card">
+                        <div class="icon">
+                            <span class="material-icons-outlined">account_balance_wallet</span>
+                        </div>
+                        <div>
+                            <h3>Saldo</h3>
+                            <p class="value">R$ 1.250,00</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="icon">
+                            <span class="material-icons-outlined">trending_down</span>
+                        </div>
+                        <div>
+                            <h3>Gastos</h3>
+                            <p class="value">R$ 430,00</p>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="icon">
+                            <span class="material-icons-outlined">flag</span>
+                        </div>
+                        <div>
+                            <h3>Objetivo</h3>
+                            <p class="value">60%</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="details-section">
+                <div class="detail-card expenses-summary">
+                    <h3>Resumo de gastos</h3>
+                    <p class="chart-label">Gastos dos últimos 7 dias</p>
+
+                    <div class="expenses-chart">
+                        <div class="bar-group">
+                            <div class="bar" style="height: 40%; background-color: #9C82FF;"></div>
+                            <span class="day-label">Seg</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 55%; background-color: #67E5D2;"></div>
+                            <span class="day-label">Ter</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 70%; background-color: #9C82FF;"></div>
+                            <span class="day-label">Qua</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 60%; background-color: #67E5D2;"></div>
+                            <span class="day-label">Qui</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 50%; background-color: #9C82FF;"></div>
+                            <span class="day-label">Sex</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 30%; background-color: #67E5D2;"></div>
+                            <span class="day-label">Sáb</span>
+                        </div>
+                        <div class="bar-group">
+                            <div class="bar" style="height: 80%; background-color: #9C82FF;"></div>
+                            <span class="day-label">Dom</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Últimas transações -->
+                <div class="detail-card last-transactions">
+                    <h3>Últimas transações</h3>
+                    <ul class="transactions-list">
+                        <li>
+                            <span class="material-icons-outlined income-icon">attach_money</span>
+                            <div>
+                                <p class="transaction-title">Freelance</p>
+                                <p class="transaction-type income">Receita</p>
+                            </div>
+                            <p class="transaction-value income">+ R$ 600,00</p>
+                        </li>
+                        <li>
+                            <span class="material-icons-outlined expense-icon">shopping_cart</span>
+                            <div>
+                                <p class="transaction-title">Supermercado</p>
+                                <p class="transaction-type expense">Despesa</p>
+                            </div>
+                            <p class="transaction-value expense">- R$ 120,00</p>
+                        </li>
+                        <li>
+                            <span class="material-icons-outlined expense-icon">local_taxi</span>
+                            <div>
+                                <p class="transaction-title">Transporte</p>
+                                <p class="transaction-type expense">Despesa</p>
+                            </div>
+                            <p class="transaction-value expense">- R$ 45,00</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Próximo objetivo -->
+                <div class="detail-card goal-card">
+                    <h3>Próximo objetivo</h3>
+                    <div class="goal-info">
+                        <p>Viagem de férias ✈️</p>
+                        <p class="goal-value">60% concluído</p>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress" style="width: 60%;"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
