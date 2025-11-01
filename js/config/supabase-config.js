@@ -17,8 +17,8 @@
 // CONFIGURAÇÕES - SUBSTITUA PELOS SEUS VALORES
 // ============================================
 
-const SUPABASE_URL = 'https://seu-projeto.supabase.co'
-const SUPABASE_ANON_KEY = 'sua-chave-anonima-aqui'
+const SUPABASE_URL = 'https://oapaprhanosvxpvjhvfk.supabase.co'
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hcGFwcmhhbm9zdnhwdmpodmZrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5NzQ3NDAsImV4cCI6MjA3NzU1MDc0MH0.88gPOehq1IthIJZRVzzEuW7HuBUhPKX0inbV69Hxvxs'
 
 // ============================================
 // VALIDAÇÃO DAS CREDENCIAIS
