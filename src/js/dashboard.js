@@ -11,7 +11,7 @@
 ;(async () => {
   const authenticated = await isAuthenticated()
   if (!authenticated) {
-    window.location.href = 'login.html'
+    window.location.href = '/src/pages/login.html'
     return
   }
 
@@ -496,7 +496,7 @@ logoutBtn.addEventListener('click', async (e) => {
   if (result.success) {
     showSuccess('Logout realizado com sucesso!')
     setTimeout(() => {
-      window.location.href = 'login.html'
+      window.location.href = '/src/pages/login.html'
     }, 1000)
   } else {
     showError('Erro ao fazer logout')

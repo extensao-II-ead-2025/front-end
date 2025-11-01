@@ -33,7 +33,7 @@ togglePassword.addEventListener('click', () => {
 ;(async () => {
   const authenticated = await isAuthenticated()
   if (authenticated) {
-    window.location.href = 'dashboard.html'
+    window.location.href = '/src/pages/dashboard.html'
   }
 })()
 
@@ -93,7 +93,7 @@ loginForm.addEventListener('submit', async (e) => {
 
       // Aguardar 1 segundo e redirecionar
       setTimeout(() => {
-        window.location.href = redirectUrl || 'dashboard.html'
+        window.location.href = redirectUrl || '/src/pages/dashboard.html'
       }, 1000)
     } else {
       // Erro no login
