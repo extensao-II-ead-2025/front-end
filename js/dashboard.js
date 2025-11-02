@@ -76,6 +76,22 @@ function initializeEventListeners() {
 }
 
 // ============================================
+// OBTER SAUDAÇÃO BASEADA NO HORÁRIO
+// ============================================
+
+function getGreeting() {
+  const hour = new Date().getHours()
+
+  if (hour >= 5 && hour < 12) {
+    return 'Bom dia'
+  } else if (hour >= 12 && hour < 18) {
+    return 'Boa tarde'
+  } else {
+    return 'Boa noite'
+  }
+}
+
+// ============================================
 // CARREGAR DADOS DO DASHBOARD
 // ============================================
 
@@ -84,22 +100,34 @@ async function loadDashboard() {
     // Mostrar loading
     showLoading()
 
-    // Buscar usuário atual
+    // Buscar usuário atual (precisa ser sequencial)
     const user = await getCurrentUser()
     if (user) {
       const firstName = user.user_metadata?.full_name?.split(' ')[0] || 'Usuário'
-      userName.textContent = `Bom dia, ${firstName}!`
+      const greeting = getGreeting()
+      userName.textContent = `${greeting}, ${firstName}!`
       userNameHeader.textContent = user.user_metadata?.full_name || 'Usuário'
+
+      // Carregar avatar do usuário
+      const profileResult = await getUserProfile()
+      if (profileResult.success && profileResult.data?.avatar_url) {
+        const avatarIcon = document.querySelector('.avatar-icon')
+        if (avatarIcon) {
+          avatarIcon.style.backgroundImage = `url(${profileResult.data.avatar_url})`
+          avatarIcon.style.backgroundSize = 'cover'
+          avatarIcon.style.backgroundPosition = 'center'
+          avatarIcon.innerHTML = ''
+        }
+      }
     }
 
-    // Carregar resumo financeiro
-    await loadFinancialSummary()
-
-    // Carregar últimas transações
-    await loadRecentTransactions()
-
-    // Carregar gráfico de gastos dos últimos 7 dias
-    await loadExpensesChart()
+    // Carregar todos os dados em paralelo para melhor performance
+    await Promise.all([
+      loadFinancialSummary(),
+      loadRecentTransactions(),
+      loadExpensesChart(),
+      loadNextGoal()
+    ])
 
     // Esconder loading
     hideLoading()
@@ -121,8 +149,16 @@ async function loadFinancialSummary() {
     if (result.success) {
       const { income, expense, balance } = result.data
 
-      // Atualizar cards
-      balanceEl.textContent = formatCurrency(balance)
+      // Calcular saldo disponível (saldo total - dinheiro em objetivos)
+      let availableBalance = balance
+      if (typeof getTotalInGoals === 'function') {
+        const totalInGoalsResult = await getTotalInGoals()
+        const totalInGoals = totalInGoalsResult.total || 0
+        availableBalance = balance - totalInGoals
+      }
+
+      // Atualizar cards (mostra saldo disponível, não total)
+      balanceEl.textContent = formatCurrency(availableBalance)
       expenseEl.textContent = formatCurrency(expense)
 
       // Calcular porcentagem de objetivo (exemplo: 60% do saldo desejado)
@@ -141,7 +177,7 @@ async function loadFinancialSummary() {
 
 async function loadRecentTransactions() {
   try {
-    const result = await getTransactions({ limit: 5, orderBy: 'created_at', ascending: false })
+    const result = await getTransactions({ limit: 4, orderBy: 'created_at', ascending: false })
 
     if (result.success && result.data.length > 0) {
       transactionsList.innerHTML = ''
@@ -150,6 +186,12 @@ async function loadRecentTransactions() {
         const li = createTransactionItem(transaction)
         transactionsList.appendChild(li)
       })
+
+      // Adicionar link "Ver todas"
+      const viewAllLink = document.createElement('li')
+      viewAllLink.style.cssText = 'text-align: center; padding: 16px; margin-top: 8px;'
+      viewAllLink.innerHTML = '<a href="transactions.html" style="color: var(--color-primary); text-decoration: none; font-weight: 500; font-size: 13px;">Ver todas as transações →</a>'
+      transactionsList.appendChild(viewAllLink)
     } else {
       transactionsList.innerHTML = '<li style="text-align: center; padding: 20px; color: #9CA3AF;">Nenhuma transação encontrada. Adicione sua primeira!</li>'
     }
@@ -443,6 +485,10 @@ function setupTransactionForm() {
       const result = await createTransaction(transactionData)
 
       if (result.success) {
+        // Invalidar cache de transações
+        if (typeof invalidateTransactionCache === 'function') {
+          invalidateTransactionCache()
+        }
         showSuccess('Transação adicionada com sucesso!')
         closeModal()
         await loadDashboard() // Recarregar dados
@@ -592,6 +638,10 @@ async function editTransaction(transactionId) {
         const result = await updateTransaction(transactionId, updates)
 
         if (result.success) {
+          // Invalidar cache de transações
+          if (typeof invalidateTransactionCache === 'function') {
+            invalidateTransactionCache()
+          }
           showSuccess('Transação atualizada com sucesso!')
           closeModal()
           await loadDashboard()
@@ -625,6 +675,10 @@ async function deleteTransactionConfirm(transactionId) {
     const result = await deleteTransaction(transactionId)
 
     if (result.success) {
+      // Invalidar cache de transações
+      if (typeof invalidateTransactionCache === 'function') {
+        invalidateTransactionCache()
+      }
       showSuccess('Transação excluída com sucesso!')
       await loadDashboard()
     } else {
@@ -634,6 +688,70 @@ async function deleteTransactionConfirm(transactionId) {
     console.error('Erro ao deletar transação:', error)
     showError('Erro ao excluir transação')
   }
+}
+
+// ============================================
+// CARREGAR PRÓXIMO OBJETIVO
+// ============================================
+
+async function loadNextGoal() {
+  try {
+    // Verificar se o service de goals está disponível
+    if (typeof getNextGoal !== 'function') {
+      console.log('Service de goals não carregado')
+      return
+    }
+
+    const result = await getNextGoal()
+
+    if (!result.success || !result.data) {
+      // Sem objetivo ativo, mostrar mensagem padrão
+      updateGoalCard(null)
+      return
+    }
+
+    updateGoalCard(result.data)
+  } catch (error) {
+    console.error('Erro ao carregar objetivo:', error)
+  }
+}
+
+function updateGoalCard(goal) {
+  const goalCard = document.querySelector('.goal-card')
+  if (!goalCard) return
+
+  if (!goal) {
+    goalCard.innerHTML = `
+      <h3>Próximo objetivo</h3>
+      <div style="text-align: center; padding: 20px;">
+        <span class="material-icons-outlined" style="font-size: 48px; color: #D1D5DB;">flag</span>
+        <p style="color: var(--color-gray); margin-top: 12px;">Nenhum objetivo ativo</p>
+        <a href="goals.html" style="color: var(--color-primary); text-decoration: none; font-weight: 500; margin-top: 8px; display: inline-block;">Criar objetivo</a>
+      </div>
+    `
+    return
+  }
+
+  const progress = goal.target_amount > 0
+    ? (goal.current_amount / goal.target_amount) * 100
+    : 0
+  const progressClamped = Math.min(progress, 100)
+
+  goalCard.innerHTML = `
+    <h3>Próximo objetivo</h3>
+    <div class="goal-info">
+      <p>${goal.name}</p>
+      <p class="goal-value">${progressClamped.toFixed(0)}% concluído</p>
+    </div>
+    <div class="progress-bar">
+      <div class="progress" style="width: ${progressClamped}%;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--color-gray); margin-top: 8px;">
+      <span>${formatCurrency(goal.current_amount)}</span>
+      <span>${formatCurrency(goal.target_amount)}</span>
+    </div>
+    <a href="goals.html" style="color: var(--color-primary); text-decoration: none; font-weight: 500; font-size: 13px; margin-top: 12px; display: inline-block;">Ver todos os objetivos →</a>
+  `
 }
 
 // ============================================

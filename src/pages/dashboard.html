@@ -10,7 +10,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined" rel="stylesheet">
 
+    <!-- Theme Service (carregar primeiro para evitar flash) -->
+    <script src="../../js/services/theme.service.js"></script>
+
     <link rel="stylesheet" href="../styles/dashboard.css" />
+    <link rel="stylesheet" href="../styles/theme-dark.css" />
 
     <!-- Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -26,12 +30,13 @@
                     <span class="material-icons-outlined">dashboard</span>
                     Panorama
                 </a>
-                <a href="#"><span class="material-icons-outlined">sync_alt</span>Lançamentos</a>
-                <a href="#"><span class="material-icons-outlined">flag</span>Objetivos</a>
-                <a href="#"><span class="material-icons-outlined">person</span>Perfil</a>
+                <a href="transactions.html"><span class="material-icons-outlined">sync_alt</span>Lançamentos</a>
+                <a href="goals.html"><span class="material-icons-outlined">flag</span>Objetivos</a>
+                <a href="profile.html"><span class="material-icons-outlined">person</span>Perfil</a>
+                <a href="about.html"><span class="material-icons-outlined">info</span>Sobre</a>
             </nav>
             <div class="sidebar-footer">
-                <a href="#"><span class="material-icons-outlined">settings</span>Configurações</a>
+                <a href="settings.html"><span class="material-icons-outlined">settings</span>Configurações</a>
                 <a href="#" class="logout"><span class="material-icons-outlined">logout</span>Sair</a>
             </div>
         </aside>
@@ -113,34 +118,7 @@
                     <p class="chart-label">Gastos dos últimos 7 dias</p>
 
                     <div class="expenses-chart">
-                        <div class="bar-group">
-                            <div class="bar" style="height: 40%; background-color: #9C82FF;"></div>
-                            <span class="day-label">Seg</span>
-                        </div>
-                        <div class="bar-group">
-                            <div class="bar" style="height: 55%; background-color: #67E5D2;"></div>
-                            <span class="day-label">Ter</span>
-                        </div>
-                        <div class="bar-group">
-                            <div class="bar" style="height: 70%; background-color: #9C82FF;"></div>
-                            <span class="day-label">Qua</span>
-                        </div>
-                        <div class="bar-group">
-                            <div class="bar" style="height: 60%; background-color: #67E5D2;"></div>
-                            <span class="day-label">Qui</span>
-                        </div>
-                        <div class="bar-group">
-                            <div class="bar" style="height: 50%; background-color: #9C82FF;"></div>
-                            <span class="day-label">Sex</span>
-                        </div>
-                        <div class="bar-group">
-                            <div class="bar" style="height: 30%; background-color: #67E5D2;"></div>
-                            <span class="day-label">Sáb</span>
-                        </div>
-                        <div class="bar-group">
-                            <div class="bar" style="height: 80%; background-color: #9C82FF;"></div>
-                            <span class="day-label">Dom</span>
-                        </div>
+                        <!-- Gráfico será carregado dinamicamente -->
                     </div>
                 </div>
 
@@ -148,52 +126,25 @@
                 <div class="detail-card last-transactions">
                     <h3>Últimas transações</h3>
                     <ul class="transactions-list">
-                        <li>
-                            <span class="material-icons-outlined income-icon">attach_money</span>
-                            <div>
-                                <p class="transaction-title">Freelance</p>
-                                <p class="transaction-type income">Receita</p>
-                            </div>
-                            <p class="transaction-value income">+ R$ 600,00</p>
-                        </li>
-                        <li>
-                            <span class="material-icons-outlined expense-icon">shopping_cart</span>
-                            <div>
-                                <p class="transaction-title">Supermercado</p>
-                                <p class="transaction-type expense">Despesa</p>
-                            </div>
-                            <p class="transaction-value expense">- R$ 120,00</p>
-                        </li>
-                        <li>
-                            <span class="material-icons-outlined expense-icon">local_taxi</span>
-                            <div>
-                                <p class="transaction-title">Transporte</p>
-                                <p class="transaction-type expense">Despesa</p>
-                            </div>
-                            <p class="transaction-value expense">- R$ 45,00</p>
-                        </li>
+                        <!-- Dados serão carregados dinamicamente -->
                     </ul>
                 </div>
 
                 <!-- Próximo objetivo -->
                 <div class="detail-card goal-card">
-                    <h3>Próximo objetivo</h3>
-                    <div class="goal-info">
-                        <p>Viagem de férias ✈️</p>
-                        <p class="goal-value">60% concluído</p>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress" style="width: 60%;"></div>
-                    </div>
+                    <!-- Objetivo será carregado dinamicamente -->
                 </div>
             </section>
         </main>
     </div>
     <!-- Scripts -->
     <script src="../../js/config/supabase-config.js"></script>
+    <script src="../../js/services/cache.service.js"></script>
     <script src="../../js/services/auth.service.js"></script>
+    <script src="../../js/services/profile.service.js"></script>
     <script src="../../js/services/transaction.service.js"></script>
     <script src="../../js/services/category.service.js"></script>
+    <script src="../../js/services/goal.service.js"></script>
     <script src="../../js/components/toast.js"></script>
     <script src="../../js/components/modal.js"></script>
     <script src="../../js/dashboard.js"></script>
