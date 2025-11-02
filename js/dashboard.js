@@ -107,6 +107,18 @@ async function loadDashboard() {
       const greeting = getGreeting()
       userName.textContent = `${greeting}, ${firstName}!`
       userNameHeader.textContent = user.user_metadata?.full_name || 'Usuário'
+
+      // Carregar avatar do usuário
+      const profileResult = await getUserProfile()
+      if (profileResult.success && profileResult.data?.avatar_url) {
+        const avatarIcon = document.querySelector('.avatar-icon')
+        if (avatarIcon) {
+          avatarIcon.style.backgroundImage = `url(${profileResult.data.avatar_url})`
+          avatarIcon.style.backgroundSize = 'cover'
+          avatarIcon.style.backgroundPosition = 'center'
+          avatarIcon.innerHTML = ''
+        }
+      }
     }
 
     // Carregar todos os dados em paralelo para melhor performance

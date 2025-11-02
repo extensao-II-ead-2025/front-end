@@ -45,6 +45,18 @@ async function loadUserInfo() {
       if (userNameEl) {
         userNameEl.textContent = user.user_metadata?.full_name || 'Usuário'
       }
+
+      // Carregar avatar do usuário
+      const profileResult = await getUserProfile()
+      if (profileResult.success && profileResult.data?.avatar_url) {
+        const avatarIcon = document.querySelector('.avatar-icon')
+        if (avatarIcon) {
+          avatarIcon.style.backgroundImage = `url(${profileResult.data.avatar_url})`
+          avatarIcon.style.backgroundSize = 'cover'
+          avatarIcon.style.backgroundPosition = 'center'
+          avatarIcon.innerHTML = ''
+        }
+      }
     }
   } catch (error) {
     console.error('Erro ao carregar informações do usuário:', error)
