@@ -23,12 +23,33 @@ let selectedColor = '#5C3FD6'
     return
   }
 
+  // Carregar informações do usuário
+  await loadUserInfo()
+
   // Inicializar elementos e listeners
   initializeEventListeners()
 
   // Carregar dados
   await loadGoalsPage()
 })()
+
+// ============================================
+// CARREGAR INFORMAÇÕES DO USUÁRIO
+// ============================================
+
+async function loadUserInfo() {
+  try {
+    const user = await getCurrentUser()
+    if (user) {
+      const userNameEl = document.querySelector('.avatar-text .name')
+      if (userNameEl) {
+        userNameEl.textContent = user.user_metadata?.full_name || 'Usuário'
+      }
+    }
+  } catch (error) {
+    console.error('Erro ao carregar informações do usuário:', error)
+  }
+}
 
 // ============================================
 // INICIALIZAR EVENT LISTENERS

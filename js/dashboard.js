@@ -165,7 +165,7 @@ async function loadFinancialSummary() {
 
 async function loadRecentTransactions() {
   try {
-    const result = await getTransactions({ limit: 5, orderBy: 'created_at', ascending: false })
+    const result = await getTransactions({ limit: 4, orderBy: 'created_at', ascending: false })
 
     if (result.success && result.data.length > 0) {
       transactionsList.innerHTML = ''
@@ -174,6 +174,12 @@ async function loadRecentTransactions() {
         const li = createTransactionItem(transaction)
         transactionsList.appendChild(li)
       })
+
+      // Adicionar link "Ver todas"
+      const viewAllLink = document.createElement('li')
+      viewAllLink.style.cssText = 'text-align: center; padding: 16px; margin-top: 8px;'
+      viewAllLink.innerHTML = '<a href="transactions.html" style="color: var(--color-primary); text-decoration: none; font-weight: 500; font-size: 13px;">Ver todas as transações →</a>'
+      transactionsList.appendChild(viewAllLink)
     } else {
       transactionsList.innerHTML = '<li style="text-align: center; padding: 20px; color: #9CA3AF;">Nenhuma transação encontrada. Adicione sua primeira!</li>'
     }
