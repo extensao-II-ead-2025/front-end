@@ -100,7 +100,7 @@ async function loadDashboard() {
     // Mostrar loading
     showLoading()
 
-    // Buscar usuário atual
+    // Buscar usuário atual (precisa ser sequencial)
     const user = await getCurrentUser()
     if (user) {
       const firstName = user.user_metadata?.full_name?.split(' ')[0] || 'Usuário'
@@ -109,17 +109,13 @@ async function loadDashboard() {
       userNameHeader.textContent = user.user_metadata?.full_name || 'Usuário'
     }
 
-    // Carregar resumo financeiro
-    await loadFinancialSummary()
-
-    // Carregar últimas transações
-    await loadRecentTransactions()
-
-    // Carregar gráfico de gastos dos últimos 7 dias
-    await loadExpensesChart()
-
-    // Carregar próximo objetivo
-    await loadNextGoal()
+    // Carregar todos os dados em paralelo para melhor performance
+    await Promise.all([
+      loadFinancialSummary(),
+      loadRecentTransactions(),
+      loadExpensesChart(),
+      loadNextGoal()
+    ])
 
     // Esconder loading
     hideLoading()
@@ -471,6 +467,10 @@ function setupTransactionForm() {
       const result = await createTransaction(transactionData)
 
       if (result.success) {
+        // Invalidar cache de transações
+        if (typeof invalidateTransactionCache === 'function') {
+          invalidateTransactionCache()
+        }
         showSuccess('Transação adicionada com sucesso!')
         closeModal()
         await loadDashboard() // Recarregar dados
@@ -620,6 +620,10 @@ async function editTransaction(transactionId) {
         const result = await updateTransaction(transactionId, updates)
 
         if (result.success) {
+          // Invalidar cache de transações
+          if (typeof invalidateTransactionCache === 'function') {
+            invalidateTransactionCache()
+          }
           showSuccess('Transação atualizada com sucesso!')
           closeModal()
           await loadDashboard()
@@ -653,6 +657,10 @@ async function deleteTransactionConfirm(transactionId) {
     const result = await deleteTransaction(transactionId)
 
     if (result.success) {
+      // Invalidar cache de transações
+      if (typeof invalidateTransactionCache === 'function') {
+        invalidateTransactionCache()
+      }
       showSuccess('Transação excluída com sucesso!')
       await loadDashboard()
     } else {
