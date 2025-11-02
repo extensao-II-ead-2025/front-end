@@ -118,6 +118,9 @@ async function loadDashboard() {
     // Carregar gráfico de gastos dos últimos 7 dias
     await loadExpensesChart()
 
+    // Carregar próximo objetivo
+    await loadNextGoal()
+
     // Esconder loading
     hideLoading()
   } catch (error) {
@@ -138,8 +141,16 @@ async function loadFinancialSummary() {
     if (result.success) {
       const { income, expense, balance } = result.data
 
-      // Atualizar cards
-      balanceEl.textContent = formatCurrency(balance)
+      // Calcular saldo disponível (saldo total - dinheiro em objetivos)
+      let availableBalance = balance
+      if (typeof getTotalInGoals === 'function') {
+        const totalInGoalsResult = await getTotalInGoals()
+        const totalInGoals = totalInGoalsResult.total || 0
+        availableBalance = balance - totalInGoals
+      }
+
+      // Atualizar cards (mostra saldo disponível, não total)
+      balanceEl.textContent = formatCurrency(availableBalance)
       expenseEl.textContent = formatCurrency(expense)
 
       // Calcular porcentagem de objetivo (exemplo: 60% do saldo desejado)
@@ -651,6 +662,70 @@ async function deleteTransactionConfirm(transactionId) {
     console.error('Erro ao deletar transação:', error)
     showError('Erro ao excluir transação')
   }
+}
+
+// ============================================
+// CARREGAR PRÓXIMO OBJETIVO
+// ============================================
+
+async function loadNextGoal() {
+  try {
+    // Verificar se o service de goals está disponível
+    if (typeof getNextGoal !== 'function') {
+      console.log('Service de goals não carregado')
+      return
+    }
+
+    const result = await getNextGoal()
+
+    if (!result.success || !result.data) {
+      // Sem objetivo ativo, mostrar mensagem padrão
+      updateGoalCard(null)
+      return
+    }
+
+    updateGoalCard(result.data)
+  } catch (error) {
+    console.error('Erro ao carregar objetivo:', error)
+  }
+}
+
+function updateGoalCard(goal) {
+  const goalCard = document.querySelector('.goal-card')
+  if (!goalCard) return
+
+  if (!goal) {
+    goalCard.innerHTML = `
+      <h3>Próximo objetivo</h3>
+      <div style="text-align: center; padding: 20px;">
+        <span class="material-icons-outlined" style="font-size: 48px; color: #D1D5DB;">flag</span>
+        <p style="color: var(--color-gray); margin-top: 12px;">Nenhum objetivo ativo</p>
+        <a href="goals.html" style="color: var(--color-primary); text-decoration: none; font-weight: 500; margin-top: 8px; display: inline-block;">Criar objetivo</a>
+      </div>
+    `
+    return
+  }
+
+  const progress = goal.target_amount > 0
+    ? (goal.current_amount / goal.target_amount) * 100
+    : 0
+  const progressClamped = Math.min(progress, 100)
+
+  goalCard.innerHTML = `
+    <h3>Próximo objetivo</h3>
+    <div class="goal-info">
+      <p>${goal.name}</p>
+      <p class="goal-value">${progressClamped.toFixed(0)}% concluído</p>
+    </div>
+    <div class="progress-bar">
+      <div class="progress" style="width: ${progressClamped}%;"></div>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 13px; color: var(--color-gray); margin-top: 8px;">
+      <span>${formatCurrency(goal.current_amount)}</span>
+      <span>${formatCurrency(goal.target_amount)}</span>
+    </div>
+    <a href="goals.html" style="color: var(--color-primary); text-decoration: none; font-weight: 500; font-size: 13px; margin-top: 12px; display: inline-block;">Ver todos os objetivos →</a>
+  `
 }
 
 // ============================================
