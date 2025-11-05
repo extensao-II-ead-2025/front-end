@@ -191,4 +191,5 @@ Este projeto está licenciado sob a licença MIT - veja o arquivo [LICENSE](LICE
 
 ---
 
-**Desenvolvido com dedicação pela equipe de alunos do Curso EAD de Análise e Desenvolvimento de Sistemas da UNIFAMETRO - 2025**
+
+**Desenvolvido com dedicação por alunos da disciplina Extensão II do curso de Análise e Desenvolvimento de Sistemas EAD da UNIFAMETRO - 2025**
