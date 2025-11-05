@@ -512,3 +512,17 @@ nav a {
     align-items: flex-start;
   }
 }
+/* Força remover o pontinho verde dos cards */
+.features-grid .feature-card .feature-icon::before {
+  content: none !important;
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: none !important;
+  border: 0 !important;
+}
+
+/* Se quiser também tirar a borda circular branca do ícone: */
+.features-grid .feature-card .feature-icon {
+  border: none !important; /* remova se ainda quiser a borda */
+}
